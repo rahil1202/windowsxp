@@ -271,10 +271,10 @@ function mountDesktopShell(): void {
 
 async function enterDesktop(): Promise<void> {
   loginProfileButton.disabled = true;
-  mountDesktopShell();
   bootScreenElement.classList.remove("is-visible", "is-exiting");
   loginScreenElement.classList.add("is-entering");
   showShellView();
+  mountDesktopShell();
 
   try {
     startupSound.currentTime = 0;
