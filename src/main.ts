@@ -75,11 +75,8 @@ root.innerHTML = `
         <img id="power-screen-icon" src="${windowsXpLogoUrl}" alt="" width="96" height="96" />
         <h2 id="power-screen-title">Windows XP is shut down.</h2>
         <p id="power-screen-copy">Press start to turn on your computer.</p>
+        <button id="power-on-button" type="button" class="power-screen__start-button">Power On</button>
       </div>
-      <button id="power-on-button" type="button" class="power-screen__start-button">
-        <img src="${windowsXpLogoUrl}" alt="" width="40" height="40" />
-        <span>Start Up</span>
-      </button>
     </section>
   </main>
 `;
