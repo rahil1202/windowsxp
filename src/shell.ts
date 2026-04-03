@@ -6,6 +6,8 @@ import {
   loginProfileAvatarUrls,
   loginUserAvatarUrl,
   rahilVahora,
+  restartIconUrl,
+  shutdownIconUrl,
   systemIconUrls,
   windowsXpLogoUrl,
   windowsXpShutdownSoundUrl
@@ -115,7 +117,6 @@ export class WindowsXpShell {
   private readonly clockTimeElement: HTMLElement;
   private readonly clockDateElement: HTMLElement;
   private readonly startButtonElement: HTMLButtonElement;
-  private readonly taskbarElement: HTMLElement;
   private readonly trayIconsElement: HTMLElement;
   private readonly volumeSliderElement: HTMLInputElement;
   private readonly altTabElement: HTMLElement;
@@ -199,7 +200,10 @@ export class WindowsXpShell {
           </section>
           <div class="xp-start-menu__footer">
             <button type="button" class="xp-start-menu__footer-action xp-start-menu__footer-action--logoff" data-log-off><span></span><strong>Log Off</strong></button>
-            <button type="button" class="xp-start-menu__footer-action xp-start-menu__footer-action--power" data-open-shutdown><span></span><strong>Turn Off Computer</strong></button>
+            <button type="button" class="xp-start-menu__footer-action xp-start-menu__footer-action--power" data-open-shutdown>
+              <span style="background-image:url('${shutdownIconUrl}')"></span>
+              <strong>Turn Off Computer</strong>
+            </button>
           </div>
         </section>
         <section class="xp-shutdown-dialog" data-shutdown-dialog aria-hidden="true">
@@ -208,8 +212,14 @@ export class WindowsXpShell {
             <p>What do you want the computer to do?</p>
             <div class="xp-shutdown-dialog__actions">
               <button type="button" data-shutdown-action="sleep">Stand By</button>
-              <button type="button" data-shutdown-action="turn-off">Turn Off</button>
-              <button type="button" data-shutdown-action="restart">Restart</button>
+              <button type="button" data-shutdown-action="turn-off">
+                <span class="xp-shutdown-dialog__action-icon" style="background-image:url('${shutdownIconUrl}')"></span>
+                <span>Turn Off</span>
+              </button>
+              <button type="button" data-shutdown-action="restart">
+                <span class="xp-shutdown-dialog__action-icon" style="background-image:url('${restartIconUrl}')"></span>
+                <span>Restart</span>
+              </button>
               <button type="button" data-shutdown-action="cancel">Cancel</button>
             </div>
           </div>
@@ -269,7 +279,6 @@ export class WindowsXpShell {
     this.clockTimeElement = this.query("[data-clock-time]");
     this.clockDateElement = this.query("[data-clock-date]");
     this.startButtonElement = this.query("[data-start-button]");
-    this.taskbarElement = this.query("[data-taskbar]");
     this.trayIconsElement = this.query("[data-tray-icons]");
     this.volumeSliderElement = this.query("[data-volume-slider]");
     this.altTabElement = this.query("[data-alt-tab]");
@@ -821,20 +830,12 @@ export class WindowsXpShell {
       const shutdownAudio = new Audio(windowsXpShutdownSoundUrl);
       shutdownAudio.volume = 0.8;
       shutdownAudio.play().catch(() => {});
-      this.desktopAreaElement.style.filter = "brightness(0)";
-      this.taskbarElement.style.filter = "brightness(0)";
-      setTimeout(() => {
-        this.callbacks.onPowerOff();
-      }, 1500);
+      this.callbacks.onPowerOff();
     } else if (action === "restart") {
       const shutdownAudio = new Audio(windowsXpShutdownSoundUrl);
       shutdownAudio.volume = 0.8;
       shutdownAudio.play().catch(() => {});
-      this.desktopAreaElement.style.filter = "brightness(0)";
-      this.taskbarElement.style.filter = "brightness(0)";
-      setTimeout(() => {
-        this.callbacks.onRestart();
-      }, 1500);
+      this.callbacks.onRestart();
     }
   }
 

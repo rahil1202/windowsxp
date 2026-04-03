@@ -3,6 +3,8 @@ import "./style.css";
 import {
   loginProfileAvatarUrls,
   loginUserAvatarUrl,
+  restartIconUrl,
+  shutdownIconUrl,
   windowsXpLogoUrl,
   windowsXpStartupSoundUrl
 } from "./assets";
@@ -57,7 +59,10 @@ root.innerHTML = `
         <p class="login-screen__hint">To begin, click your user name</p>
       </div>
       <div class="login-screen__footer">
-        <button id="login-power" type="button" class="login-screen__power">Turn off computer</button>
+        <button id="login-power" type="button" class="login-screen__power">
+          <span class="login-screen__power-icon" style="background-image:url('${shutdownIconUrl}')"></span>
+          <span>Turn off computer</span>
+        </button>
         <span class="login-screen__footer-copy">
           <span>After you log on, you can add or change accounts.</span>
           <span>Just go to Control Panel and click User Accounts.</span>
@@ -67,13 +72,13 @@ root.innerHTML = `
 
     <section id="power-screen" class="power-screen" aria-hidden="true">
       <div class="power-screen__panel">
-        <img src="${windowsXpLogoUrl}" alt="" width="96" height="96" />
+        <img id="power-screen-icon" src="${windowsXpLogoUrl}" alt="" width="96" height="96" />
         <h2 id="power-screen-title">Windows XP is shut down.</h2>
         <p id="power-screen-copy">Press start to turn on your computer.</p>
       </div>
       <button id="power-on-button" type="button" class="power-screen__start-button">
         <img src="${windowsXpLogoUrl}" alt="" width="40" height="40" />
-        <span>start</span>
+        <span>Start Up</span>
       </button>
     </section>
   </main>
@@ -86,6 +91,7 @@ const powerScreen = document.querySelector<HTMLElement>("#power-screen");
 const loginProfile = document.querySelector<HTMLButtonElement>("#login-profile");
 const loginPower = document.querySelector<HTMLButtonElement>("#login-power");
 const powerOnButton = document.querySelector<HTMLButtonElement>("#power-on-button");
+const powerScreenIcon = document.querySelector<HTMLImageElement>("#power-screen-icon");
 const loginAvatar = document.querySelector<HTMLImageElement>("#login-avatar");
 const bootProgressGlow = document.querySelector<HTMLElement>(".boot-screen__progress-glow");
 const powerScreenTitle = document.querySelector<HTMLElement>("#power-screen-title");
@@ -99,6 +105,7 @@ if (
   !loginProfile ||
   !loginPower ||
   !powerOnButton ||
+  !powerScreenIcon ||
   !powerScreenTitle ||
   !powerScreenCopy
 ) {
@@ -112,6 +119,7 @@ const powerScreenElement = powerScreen;
 const loginProfileButton = loginProfile;
 const loginPowerButton = loginPower;
 const powerOnButtonElement = powerOnButton;
+const powerScreenIconElement = powerScreenIcon;
 const powerScreenTitleElement = powerScreenTitle;
 const powerScreenCopyElement = powerScreenCopy;
 
@@ -127,6 +135,18 @@ startupSound.preload = "none";
 
 let shell: WindowsXpShell | null = null;
 
+function hideShellView(): void {
+  shellViewElement.classList.remove("is-visible");
+  shellViewElement.setAttribute("aria-hidden", "true");
+  shellViewElement.style.display = "none";
+}
+
+function showShellView(): void {
+  shellViewElement.style.display = "";
+  shellViewElement.classList.add("is-visible");
+  shellViewElement.setAttribute("aria-hidden", "false");
+}
+
 function destroyShell(): void {
   shell?.destroy();
   shell = null;
@@ -139,8 +159,7 @@ function showBoot(): void {
     const speed = speeds[Math.floor(Math.random() * speeds.length)] ?? 1.1;
     bootProgressGlow.style.animationDuration = `${speed}s`;
   }
-  shellViewElement.classList.remove("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "true");
+  hideShellView();
   powerScreenElement.classList.remove("is-visible");
   powerScreenElement.setAttribute("aria-hidden", "true");
   loginScreenElement.classList.remove("is-visible", "is-entering");
@@ -149,8 +168,7 @@ function showBoot(): void {
 
 function showLogin(): void {
   destroyShell();
-  shellViewElement.classList.remove("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "true");
+  hideShellView();
   powerScreenElement.classList.remove("is-visible");
   powerScreenElement.setAttribute("aria-hidden", "true");
   bootScreenElement.classList.remove("is-visible", "is-exiting");
@@ -162,21 +180,55 @@ function setPowerScreenMessage(title: string, copy: string): void {
   powerScreenCopyElement.textContent = copy;
 }
 
+function setPowerScreenIcon(src: string): void {
+  powerScreenIconElement.src = src;
+}
+
 function showPoweredOff(): void {
   destroyShell();
-  shellViewElement.classList.remove("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "true");
+  hideShellView();
   bootScreenElement.classList.remove("is-visible", "is-exiting");
   loginScreenElement.classList.remove("is-visible", "is-entering");
+  setPowerScreenIcon(shutdownIconUrl);
   setPowerScreenMessage("Windows XP is shut down.", "Press start to turn on your computer.");
   powerScreenElement.classList.add("is-visible");
   powerScreenElement.setAttribute("aria-hidden", "false");
+  powerOnButtonElement.hidden = false;
+}
+
+async function showShutdownTransition(): Promise<void> {
+  destroyShell();
+  hideShellView();
+  bootScreenElement.classList.remove("is-visible", "is-exiting");
+  loginScreenElement.classList.remove("is-visible", "is-entering");
+  setPowerScreenIcon(shutdownIconUrl);
+  setPowerScreenMessage("Windows is shutting down...", "Saving your settings.");
+  powerScreenElement.classList.add("is-visible");
+  powerScreenElement.setAttribute("aria-hidden", "false");
+  powerOnButtonElement.hidden = true;
+  await new Promise((resolve) => window.setTimeout(resolve, 1300));
+  setPowerScreenIcon(shutdownIconUrl);
+  setPowerScreenMessage("Windows XP is shut down.", "Press Start Up to turn on your computer.");
+  powerOnButtonElement.hidden = false;
+}
+
+async function showRestartTransition(): Promise<void> {
+  destroyShell();
+  hideShellView();
+  bootScreenElement.classList.remove("is-visible", "is-exiting");
+  loginScreenElement.classList.remove("is-visible", "is-entering");
+  setPowerScreenIcon(restartIconUrl);
+  setPowerScreenMessage("Windows is restarting...", "Please wait.");
+  powerScreenElement.classList.add("is-visible");
+  powerScreenElement.setAttribute("aria-hidden", "false");
+  powerOnButtonElement.hidden = true;
+  await new Promise((resolve) => window.setTimeout(resolve, 1100));
+  await restartSystem();
 }
 
 async function showSleepTransition(): Promise<void> {
   destroyShell();
-  shellViewElement.classList.remove("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "true");
+  hideShellView();
   bootScreenElement.classList.remove("is-visible", "is-exiting");
   loginScreenElement.classList.remove("is-visible", "is-entering");
   setPowerScreenMessage("Windows XP is entering standby.", "Waking up returns you to the Welcome screen.");
@@ -190,8 +242,7 @@ async function showSleepTransition(): Promise<void> {
 
 async function restartSystem(): Promise<void> {
   destroyShell();
-  shellViewElement.classList.remove("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "true");
+  hideShellView();
   loginScreenElement.classList.remove("is-visible", "is-entering");
   powerScreenElement.classList.remove("is-visible");
   powerScreenElement.setAttribute("aria-hidden", "true");
@@ -207,10 +258,10 @@ function mountDesktopShell(): void {
       showLogin();
     },
     onRestart() {
-      void restartSystem();
+      void showRestartTransition();
     },
     onPowerOff() {
-      showPoweredOff();
+      void showShutdownTransition();
     },
     onSleep() {
       void showSleepTransition();
@@ -223,8 +274,7 @@ async function enterDesktop(): Promise<void> {
   mountDesktopShell();
   bootScreenElement.classList.remove("is-visible", "is-exiting");
   loginScreenElement.classList.add("is-entering");
-  shellViewElement.classList.add("is-visible");
-  shellViewElement.setAttribute("aria-hidden", "false");
+  showShellView();
 
   try {
     startupSound.currentTime = 0;

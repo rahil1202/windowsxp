@@ -152,6 +152,8 @@ export const windowsXpLogoUrl = assetUrl("./assets/windows-xp-logo.png");
 export const loginUserAvatarUrl = assetUrl("./assets/icons/windows-xp.png");
 export const rahilVahora = assetUrl("./assets/rahil-vahora.jpg");
 export const githubIconUrl = assetUrl("./assets/icons/github.png");
+export const shutdownIconUrl = assetUrl("./assets/icons/shutdown.png");
+export const restartIconUrl = assetUrl("./assets/icons/restart.png");
 export const loginProfileAvatarUrls = [
   assetUrl("./assets/pp/airplane-pp.jpg"),
   assetUrl("./assets/pp/astronaut-pp.jpg"),
