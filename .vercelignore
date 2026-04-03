@@ -1,0 +1,8 @@
+node_modules
+dist
+.git
+.vendor-temp
+output
+test-results
+*.log
+*.err
