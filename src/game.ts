@@ -74,7 +74,6 @@ export class DesktopDestroyerGame {
   private toolboxWasAutoOpened = false;
   private deterministicAdvance = false;
   private toolFocusIndex = 0;
-  private bsodTriggered = false;
 
   constructor(
     private readonly elements: GameElements,
@@ -1428,17 +1427,6 @@ export class DesktopDestroyerGame {
       ...partial
     };
     this.state.decals.push(decal);
-    if (this.embeddedMode && !this.bsodTriggered && this.state.decals.length >= 180) {
-      this.bsodTriggered = true;
-      window.dispatchEvent(
-        new CustomEvent("xp-shell-command", {
-          detail: {
-            command: "trigger-bsod",
-            payload: { reason: "desktop-destroyer" }
-          }
-        })
-      );
-    }
     return decal;
   }
 
@@ -1679,7 +1667,6 @@ export class DesktopDestroyerGame {
     this.state.decals = [];
     this.state.particles = [];
     this.state.entities = [];
-    this.bsodTriggered = false;
     this.state.cameraShake.strength = 0;
     this.audio.stopAllLoops();
     this.elements.loader.classList.add("is-visible");

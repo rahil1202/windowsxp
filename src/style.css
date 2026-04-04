@@ -3068,7 +3068,6 @@ button {
 
 .xp-shell__user-shortcut {
   position: relative;
-  z-index: 6;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3086,7 +3085,7 @@ button {
   position: absolute;
   top: 14px;
   right: 16px;
-  z-index: 5;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 8px;

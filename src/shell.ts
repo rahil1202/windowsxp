@@ -1,7 +1,5 @@
 import { appRegistry, appRegistryById } from "./app-registry";
 import {
-  appCloseSoundUrl,
-  appOpenSoundUrl,
   githubIconUrl,
   loginProfileAvatarUrls,
   loginUserAvatarUrl,
@@ -319,7 +317,6 @@ export class WindowsXpShell {
     if (!definition) {
       return;
     }
-    this.playSystemSound(appOpenSoundUrl);
     if (definition.launchMode === "overlay") {
       void this.mountOverlayApp(definition);
       return;
@@ -1268,7 +1265,6 @@ export class WindowsXpShell {
     if (!windowItem) {
       return;
     }
-    this.playSystemSound(appCloseSoundUrl);
     windowItem.instance?.unmount();
     windowItem.taskbarButton.remove();
     windowItem.element.remove();
@@ -1404,12 +1400,6 @@ export class WindowsXpShell {
     const now = new Date();
     this.clockTimeElement.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     this.clockDateElement.textContent = now.toLocaleDateString([], { month: "numeric", day: "numeric", year: "2-digit" });
-  }
-
-  private playSystemSound(src: string): void {
-    const audio = new Audio(src);
-    audio.volume = 0.6;
-    audio.play().catch(() => {});
   }
 
   private setBusyCursor(active: boolean): void {
